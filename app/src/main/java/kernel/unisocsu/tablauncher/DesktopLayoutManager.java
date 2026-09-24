@@ -2,7 +2,6 @@ package kernel.unisocsu.tablauncher;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -30,5 +29,9 @@ public class DesktopLayoutManager {
 
     public int getPosition(String packageName, int fallback) {
         return prefs.getInt(packageName, fallback);
+    }
+
+    public void remove(String packageName) {
+        prefs.edit().remove(packageName).apply();
     }
 }
