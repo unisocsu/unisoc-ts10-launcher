@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.DragEvent;
+import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,6 +30,20 @@ public class DesktopView extends FrameLayout {
 
     public DesktopView(Context context) {
         super(context);
+        initialize(context);
+    }
+
+    public DesktopView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initialize(context);
+    }
+
+    public DesktopView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        initialize(context);
+    }
+
+    private void initialize(Context context) {
         layout = new DesktopLayoutManager(context);
         pm = context.getPackageManager();
         setBackgroundColor(Color.TRANSPARENT);
