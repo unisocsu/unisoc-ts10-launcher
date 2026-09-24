@@ -5,11 +5,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.view.DragEvent;
 import android.util.AttributeSet;
+import android.view.DragEvent;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.DragShadowBuilder;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -20,9 +20,9 @@ import java.util.Comparator;
 import java.util.List;
 
 public class DesktopView extends FrameLayout {
-    private final DesktopLayoutManager layout;
-    private final DesktopStateStore stateStore;
-    private final PackageManager pm;
+    private DesktopLayoutManager layout;
+    private DesktopStateStore stateStore;
+    private PackageManager pm;
     private final List<LauncherItem> apps = new ArrayList<LauncherItem>();
     private final List<FolderItem> folders = new ArrayList<FolderItem>();
     private final int columns = 5;
@@ -77,9 +77,13 @@ public class DesktopView extends FrameLayout {
         rebuild();
     }
 
-    public List<FolderItem> getFolders() { return folders; }
+    public List<FolderItem> getFolders() {
+        return folders;
+    }
 
-    private void saveFolders() { stateStore.saveFolders(folders); }
+    private void saveFolders() {
+        stateStore.saveFolders(folders);
+    }
 
     private int slotAt(float x, float y) {
         int col = cellW <= 0 ? 0 : (int) (x / cellW);
@@ -104,7 +108,9 @@ public class DesktopView extends FrameLayout {
     }
 
     private void createFolder(LauncherItem a, LauncherItem b) {
-        FolderItem folder = new FolderItem("folder_" + a.packageName + "_" + b.packageName, "Folder");
+        FolderItem folder = new FolderItem(
+                "folder_" + a.packageName + "_" + b.packageName,
+                "Folder");
         folder.add(a);
         folder.add(b);
         folders.add(folder);
@@ -126,7 +132,8 @@ public class DesktopView extends FrameLayout {
         ImageView icon = new ImageView(getContext());
         try {
             icon.setImageDrawable(pm.getApplicationIcon(item.packageName));
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         cell.addView(icon, new LinearLayout.LayoutParams(-1, 66));
 
         TextView name = new TextView(getContext());
@@ -139,7 +146,9 @@ public class DesktopView extends FrameLayout {
         cell.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent launch = pm.getLaunchIntentForPackage(item.packageName);
-                if (launch != null) getContext().startActivity(launch);
+                if (launch != null) {
+                    getContext().startActivity(launch);
+                }
             }
         });
 
@@ -165,21 +174,28 @@ public class DesktopView extends FrameLayout {
         return cell;
     }
 
-    public void addWidgetView(View widget) {
+    public void addWidgetView(final View widget) {
+        if (cellW <= 0) {
+            cellW = getWidth() > 0 ? getWidth() / columns : 160;
+        }
+
         LayoutParams lp = new LayoutParams(-1, cellH * 2);
         int slot = stateStore.getWidgetSlot();
         lp.leftMargin = (slot % columns) * cellW;
         lp.topMargin = (slot / columns) * cellH;
         addView(widget, lp);
+
         widget.setOnLongClickListener(new OnLongClickListener() {
             public boolean onLongClick(View v) {
                 v.startDrag(null, new DragShadowBuilder(v), v, 0);
                 return true;
             }
         });
+
         widget.setOnDragListener(new OnDragListener() {
             public boolean onDrag(View v, DragEvent event) {
-                if (event.getAction() == DragEvent.ACTION_DROP && event.getLocalState() == v) {
+                if (event.getAction() == DragEvent.ACTION_DROP &&
+                        event.getLocalState() == v) {
                     int slot = slotAt(event.getX(), event.getY());
                     stateStore.saveWidgetLayout(slot, 5, 2);
                     LayoutParams moved = (LayoutParams) v.getLayoutParams();
@@ -198,11 +214,13 @@ public class DesktopView extends FrameLayout {
         post(new Runnable() {
             public void run() {
                 cellW = getWidth() > 0 ? getWidth() / columns : 160;
+
                 Collections.sort(apps, new Comparator<LauncherItem>() {
                     public int compare(LauncherItem a, LauncherItem b) {
                         return a.position - b.position;
                     }
                 });
+
                 for (LauncherItem item : apps) {
                     View v = appCell(item);
                     int row = item.position / columns;
@@ -212,10 +230,13 @@ public class DesktopView extends FrameLayout {
                     lp.topMargin = row * cellH + 4;
                     addView(v, lp);
                 }
+
                 int folderSlot = apps.size();
                 for (FolderItem folder : folders) {
                     View v = new FolderView(getContext(), folder, new Runnable() {
-                        public void run() { rebuild(); }
+                        public void run() {
+                            rebuild();
+                        }
                     });
                     int row = folderSlot / columns;
                     int col = folderSlot % columns;
