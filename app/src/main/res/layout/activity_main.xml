@@ -1,8 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="16dp">
-    <TextView android:id="@+id/clock" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="28sp" android:gravity="center_vertical" />
-    <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="horizontal">
-        <FrameLayout android:id="@+id/navigation_container" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="2" />
-        <GridView android:id="@+id/app_grid" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:numColumns="2" android:verticalSpacing="12dp" android:horizontalSpacing="12dp" android:stretchMode="columnWidth" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/clock"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:gravity="center_vertical" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:id="@+id/navigation_container"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2" />
+
+        <GridView
+            android:id="@+id/app_grid"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:numColumns="2"
+            android:verticalSpacing="10dp"
+            android:horizontalSpacing="10dp"
+            android:stretchMode="columnWidth"
+            android:padding="8dp"
+            android:clipToPadding="false" />
     </LinearLayout>
 </LinearLayout>
