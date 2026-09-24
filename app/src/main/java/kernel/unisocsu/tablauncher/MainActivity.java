@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 import java.text.SimpleDateFormat;
@@ -21,6 +20,7 @@ public class MainActivity extends Activity {
     private static final int APPWIDGET_HOST_ID = 1024;
     private final Handler handler = new Handler();
     private TextView clock;
+    private DesktopLayoutManager desktopLayout;
     private AppWidgetHost widgetHost;
     private final Runnable clockTick = new Runnable() {
         public void run() {
@@ -33,6 +33,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         clock = (TextView) findViewById(R.id.clock);
         widgetHost = new AppWidgetHost(this, APPWIDGET_HOST_ID);
+        desktopLayout = new DesktopLayoutManager(this);
         loadApplications();
         clockTick.run();
     }
@@ -46,9 +47,13 @@ public class MainActivity extends Activity {
         java.util.Collections.sort(apps, new java.util.Comparator<ApplicationInfo>() {
             public int compare(ApplicationInfo a, ApplicationInfo b) { return pm.getApplicationLabel(a).toString().compareToIgnoreCase(pm.getApplicationLabel(b).toString()); }
         });
-        List<String> names = new ArrayList<String>();
-        for (ApplicationInfo a : apps) names.add(pm.getApplicationLabel(a).toString());
-        grid.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, names));
+        final List<LauncherItem> items = new ArrayList<LauncherItem>();
+        for (int i = 0; i < apps.size(); i++) {
+            ApplicationInfo a = apps.get(i);
+            items.add(new LauncherItem(a.packageName, pm.getApplicationLabel(a).toString(), desktopLayout.getPosition(a.packageName, i)));
+        }
+        desktopLayout.sort(items);
+        grid.setAdapter(new LauncherAdapter(this, items));
         grid.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
             public void onItemClick(android.widget.AdapterView<?> p, View v, int position, long id) {
                 Intent launch = pm.getLaunchIntentForPackage(apps.get(position).packageName);
