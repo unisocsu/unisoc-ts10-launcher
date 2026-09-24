@@ -21,6 +21,7 @@ import java.util.List;
 
 public class DesktopView extends FrameLayout {
     private final DesktopLayoutManager layout;
+    private final DesktopStateStore stateStore;
     private final PackageManager pm;
     private final List<LauncherItem> apps = new ArrayList<LauncherItem>();
     private final List<FolderItem> folders = new ArrayList<FolderItem>();
@@ -45,6 +46,7 @@ public class DesktopView extends FrameLayout {
 
     private void initialize(Context context) {
         layout = new DesktopLayoutManager(context);
+        stateStore = new DesktopStateStore(context);
         pm = context.getPackageManager();
         setBackgroundColor(Color.TRANSPARENT);
 
@@ -75,6 +77,10 @@ public class DesktopView extends FrameLayout {
         rebuild();
     }
 
+    public List<FolderItem> getFolders() { return folders; }
+
+    private void saveFolders() { stateStore.saveFolders(folders); }
+
     private int slotAt(float x, float y) {
         int col = cellW <= 0 ? 0 : (int) (x / cellW);
         int row = (int) (y / cellH);
@@ -102,6 +108,7 @@ public class DesktopView extends FrameLayout {
         folder.add(a);
         folder.add(b);
         folders.add(folder);
+        saveFolders();
         apps.remove(a);
         apps.remove(b);
         layout.remove(a.packageName);
@@ -160,12 +167,27 @@ public class DesktopView extends FrameLayout {
 
     public void addWidgetView(View widget) {
         LayoutParams lp = new LayoutParams(-1, cellH * 2);
-        lp.leftMargin = 0;
-        lp.topMargin = 0;
+        int slot = stateStore.getWidgetSlot();
+        lp.leftMargin = (slot % columns) * cellW;
+        lp.topMargin = (slot / columns) * cellH;
         addView(widget, lp);
         widget.setOnLongClickListener(new OnLongClickListener() {
             public boolean onLongClick(View v) {
                 v.startDrag(null, new DragShadowBuilder(v), v, 0);
+                return true;
+            }
+        });
+        widget.setOnDragListener(new OnDragListener() {
+            public boolean onDrag(View v, DragEvent event) {
+                if (event.getAction() == DragEvent.ACTION_DROP && event.getLocalState() == v) {
+                    int slot = slotAt(event.getX(), event.getY());
+                    stateStore.saveWidgetLayout(slot, 5, 2);
+                    LayoutParams moved = (LayoutParams) v.getLayoutParams();
+                    moved.leftMargin = (slot % columns) * cellW;
+                    moved.topMargin = (slot / columns) * cellH;
+                    v.setLayoutParams(moved);
+                    return true;
+                }
                 return true;
             }
         });
