@@ -51,6 +51,7 @@ public class MainActivity extends Activity {
         widgetManager = AppWidgetManager.getInstance(this);
         widgetHost = new AppWidgetHost(this, APPWIDGET_HOST_ID);
         loadApps();
+        desktop.setFolders(new DesktopStateStore(this).loadFolders());
         restoreWidget();
         clockTick.run();
     }
