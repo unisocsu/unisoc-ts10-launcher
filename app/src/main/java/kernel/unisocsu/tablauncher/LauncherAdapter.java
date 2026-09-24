@@ -3,6 +3,8 @@ package kernel.unisocsu.tablauncher;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -30,14 +32,16 @@ public class LauncherAdapter extends BaseAdapter {
         LinearLayout cell = new LinearLayout(context);
         cell.setOrientation(LinearLayout.VERTICAL);
         cell.setGravity(17);
-        cell.setPadding(8, 8, 8, 8);
+        cell.setPadding(12, 12, 12, 12);
+        cell.setBackgroundDrawable(new ColorDrawable(Color.argb(55, 255, 255, 255)));
 
         ImageView icon = new ImageView(context);
         try { icon.setImageDrawable(pm.getApplicationIcon(items.get(position).packageName)); } catch (Exception ignored) {}
-        cell.addView(icon, new LinearLayout.LayoutParams(-1, 64));
+        cell.addView(icon, new LinearLayout.LayoutParams(-1, 80));
 
         TextView title = new TextView(context);
         title.setText(items.get(position).title);
+        title.setTextSize(16);
         title.setGravity(17);
         title.setSingleLine(true);
         cell.addView(title, new LinearLayout.LayoutParams(-1, -2));
